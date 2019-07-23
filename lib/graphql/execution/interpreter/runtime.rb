@@ -8,6 +8,10 @@ module GraphQL
       #
       # @api private
       class Runtime
+        class << self
+          attr_accessor :results_caching_enabled
+        end
+
         # @return [GraphQL::Query]
         attr_reader :query
 
@@ -16,6 +20,8 @@ module GraphQL
 
         # @return [GraphQL::Query::Context]
         attr_reader :context
+
+        attr_reader :results_cache
 
         def initialize(query:, response:)
           @query = query
@@ -29,6 +35,7 @@ module GraphQL
           # Which assumes that MyObject.get_field("myField") will return the same field
           # during the lifetime of a query
           @fields_cache = Hash.new { |h, k| h[k] = {} }
+          @results_cache = Hash.new
         end
 
         def final_value
@@ -115,7 +122,19 @@ module GraphQL
           end
         end
 
+        CACHEABLE_TYPES = ['Locale', 'PropertyGroup', 'Property'].freeze
+
         def evaluate_selections(path, owner_object, owner_type, selections, root_operation_type: nil)
+          cache_key = nil
+          if self.class.results_caching_enabled && CACHEABLE_TYPES.include?(owner_type.graphql_name)
+            # TODO: This doesn't take selection args into account
+            cache_key = selections.map(&:name) << owner_object.object
+            if results_cache.include?(cache_key)
+              write_in_response(path, results_cache[cache_key])
+              return
+            end
+          end
+
           selections_by_name = {}
           gather_selections(owner_object, owner_type, selections, selections_by_name)
           selections_by_name.each do |result_name, field_ast_nodes_or_ast_node|
@@ -214,6 +233,11 @@ module GraphQL
                   continue_field(next_path, continue_value, field_defn, return_type, ast_node, next_selections, false)
                 end
               end
+            end
+
+            if self.class.results_caching_enabled && CACHEABLE_TYPES.include?(owner_type.graphql_name)
+              # TODO: This doesn't work unless the subtree has been fully evaluated
+              results_cache[cache_key] = @response.final_value.dig(*path)
             end
 
             # If this field is a root mutation field, immediately resolve
