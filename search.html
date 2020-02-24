@@ -19,9 +19,10 @@
           </a>
           <a href="/getting_started">Get Started</a>
           <a href="/guides">Guides</a>
-          <a href="http://www.rubydoc.info/gems/graphql/1.7.13/">API</a>
+          <a href="/api-doc/1.10.3/">API</a>
           <a href="https://tinyletter.com/graphql-ruby">Newsletter</a>
           <a href="https://github.com/rmosolgo/graphql-ruby">Source Code</a>
+          <a href="https://graphql.pro">Upgrade to Pro</a>
           <input
             class="search-input"
             onkeyup="GraphQLRubySearch.run(this)"
@@ -31,7 +32,8 @@
         </div>
       </div>
       <div class="search-results-container">
-        <div id="search-results"></div>
+        <div id="search-results">
+        </div>
       </div>
     </div>
     <div class="container">
@@ -55,7 +57,7 @@
     if (!searchQueryMatch) {
       renderResults("(no query)", [])
     } else {
-      searchQuery = searchQueryMatch[1]
+      searchQuery = decodeURIComponent(searchQueryMatch[1])
       index.search({query: searchQuery, hitsPerPage: 1000}, function(err, content) {
         renderResults(searchQuery, content.hits)
       })
@@ -69,14 +71,6 @@
       var resultsTemplate = document.getElementById("search-page-result-template")
 
       function writeToTemplate(header, body, resultType) {
-        var previewLength = 200
-        var bodyPreview
-        if (body.length > previewLength) {
-          bodyPreview = body.substr(0, previewLength) + "..."
-        } else {
-          bodyPreview = body
-        }
-
         resultsTemplate
           .content
           .querySelector(".search-page-result-title")
@@ -84,7 +78,7 @@
         resultsTemplate
           .content
           .querySelector(".search-page-result-body")
-          .innerHTML = bodyPreview
+          .innerHTML = body
 
         var resultEl = document.importNode(resultsTemplate.content, true);
         resultsContainer.appendChild(resultEl)
@@ -94,10 +88,19 @@
         writeToTemplate("No Results", "")
       } else {
         results.forEach(function(result) {
-          console.log(result)
-          var resultPath = result.url + (result.css_selector_parent || "")
-          var header = "<a href='" + resultPath + "'>" + result.unique_hierarchy + '</a>'
-          writeToTemplate(header, result.raw_html)
+          var resultPath
+          if (result.anchor) {
+            resultPath = result.url + "#" + result.anchor
+          } else {
+            resultPath = result.url
+          }
+
+          var resultHeader = [result.section || "API", result.title].concat(result.headings).join(" > ")
+
+          var header = "<a href='" + resultPath + "'>" + resultHeader + '</a>'
+
+          var resultBody = result.rubydoc_url ? "API Docs for " + result.title : result._highlightResult.html.value
+          writeToTemplate(header, resultBody)
         })
       }
     }

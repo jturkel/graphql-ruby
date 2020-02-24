@@ -19,9 +19,10 @@
           </a>
           <a href="/getting_started">Get Started</a>
           <a href="/guides">Guides</a>
-          <a href="http://www.rubydoc.info/gems/graphql/1.7.13/">API</a>
+          <a href="/api-doc/1.10.3/">API</a>
           <a href="https://tinyletter.com/graphql-ruby">Newsletter</a>
           <a href="https://github.com/rmosolgo/graphql-ruby">Source Code</a>
+          <a href="https://graphql.pro">Upgrade to Pro</a>
           <input
             class="search-input"
             onkeyup="GraphQLRubySearch.run(this)"
@@ -31,14 +32,15 @@
         </div>
       </div>
       <div class="search-results-container">
-        <div id="search-results"></div>
+        <div id="search-results">
+        </div>
       </div>
     </div>
     <div class="container">
       <p class="breadcrumb">
   <a href="/">GraphQL</a>
   &raquo; <a href="/guides">Guides</a>
-   &raquo; Schema
+   &raquo; <a href="/guides#schema-guides">Schema</a>
   &raquo; Lazy Execution
 </p>
 
@@ -49,11 +51,9 @@
 
 <ul>
   <li>Define a lazy-loading class with <em>one</em> method for loading &amp; returning a value</li>
-  <li>Connect it to your schema with <a href="http://www.rubydoc.info/gems/graphql/1.7.13/GraphQL/Schema#lazy_resolve-instance_method" target="_blank" title="API docs for GraphQL::Schema#lazy_resolve"><code>GraphQL::Schema#lazy_resolve</code></a></li>
+  <li>Connect it to your schema with <a href="/api-doc/1.10.3/GraphQL/Schema#lazy_resolve-instance_method" target="_blank" title="API docs for GraphQL::Schema#lazy_resolve"><code>GraphQL::Schema#lazy_resolve</code></a></li>
   <li>In <code class="highlighter-rouge">resolve</code> functions, return instances of the lazy-loading class</li>
 </ul>
-
-<p>Lazy resolution can be <a href="/fields/instrumentation">instrumented</a>.</p>
 
 <h2 id="example-batched-find">Example: Batched Find</h2>
 
@@ -101,7 +101,7 @@
   <li>Connect the lazy resolve method</li>
 </ol>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">MySchema</span> <span class="o">=</span> <span class="no">GraphQL</span><span class="o">::</span><span class="no">Schema</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MySchema</span> <span class="o">&lt;</span> <span class="no">GraphQL</span><span class="o">::</span><span class="no">Schema</span>
   <span class="c1"># ...</span>
   <span class="n">lazy_resolve</span><span class="p">(</span><span class="no">LazyFindPerson</span><span class="p">,</span> <span class="ss">:person</span><span class="p">)</span>
 <span class="k">end</span>
@@ -111,10 +111,10 @@
   <li>Return lazy objects from <code class="highlighter-rouge">resolve</code></li>
 </ol>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">field</span> <span class="ss">:author</span><span class="p">,</span> <span class="no">PersonType</span> <span class="k">do</span>
-  <span class="n">resolve</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span> <span class="p">{</span>
-    <span class="no">LazyFindPerson</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">obj</span><span class="p">.</span><span class="nf">author_id</span><span class="p">)</span>
-  <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">field</span> <span class="ss">:author</span><span class="p">,</span> <span class="no">PersonType</span><span class="p">,</span> <span class="ss">null: </span><span class="kp">true</span>
+
+<span class="k">def</span> <span class="nf">author</span>
+  <span class="no">LazyFindPerson</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">object</span><span class="p">.</span><span class="nf">author_id</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre></div></div>
 

@@ -19,9 +19,10 @@
           </a>
           <a href="/getting_started">Get Started</a>
           <a href="/guides">Guides</a>
-          <a href="http://www.rubydoc.info/gems/graphql/1.7.13/">API</a>
+          <a href="/api-doc/1.10.3/">API</a>
           <a href="https://tinyletter.com/graphql-ruby">Newsletter</a>
           <a href="https://github.com/rmosolgo/graphql-ruby">Source Code</a>
+          <a href="https://graphql.pro">Upgrade to Pro</a>
           <input
             class="search-input"
             onkeyup="GraphQLRubySearch.run(this)"
@@ -31,14 +32,15 @@
         </div>
       </div>
       <div class="search-results-container">
-        <div id="search-results"></div>
+        <div id="search-results">
+        </div>
       </div>
     </div>
     <div class="container">
       <p class="breadcrumb">
   <a href="/">GraphQL</a>
   &raquo; <a href="/guides">Guides</a>
-   &raquo; Subscriptions
+   &raquo; <a href="/guides#subscriptions-guides">Subscriptions</a>
   &raquo; Overview
 </p>
 
@@ -55,7 +57,7 @@
 
 <h3 id="subscription-type">Subscription Type</h3>
 
-<p><code class="highlighter-rouge">subscription</code> is an entry point to your GraphQL schema, like <code class="highlighter-rouge">query</code> or <code class="highlighter-rouge">mutation</code>. It is defined by your <code class="highlighter-rouge">SubscriptionType</code>, a root-level <code class="highlighter-rouge">ObjectType</code>.</p>
+<p><code class="highlighter-rouge">subscription</code> is an entry point to your GraphQL schema, like <code class="highlighter-rouge">query</code> or <code class="highlighter-rouge">mutation</code>. It is defined by your <code class="highlighter-rouge">SubscriptionType</code>, a root-level <code class="highlighter-rouge">GraphQL::Schema::Object</code>.</p>
 
 <p>Read more in the <a href="/subscriptions/subscription_type">Subscription Type guide</a>.</p>
 
