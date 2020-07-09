@@ -26,3 +26,4 @@ spec/integration/tmp
 *.swp
 *.swo
 javascript_client/dist/
+out
